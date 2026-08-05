@@ -1,0 +1,69 @@
+:root {
+  /* Brand */
+  --color-primary:         #1A6B3A;
+  --color-primary-hover:   #155730;
+  --color-primary-light:   #3AA870;
+  --color-primary-surface: #E8F5EC;
+
+  /* Page structure — better contrast with white cards */
+  --color-bg-page:    #EEF2EE;  /* warm sage gray, kontras kuat dengan card putih */
+  --color-bg-surface: #FFFFFF;
+  --color-bg-sidebar: #1A3A28;
+  --color-bg-sidebar-active: #2D5A3D;
+
+  /* Subtle surface for nested areas */
+  --color-bg-subtle:  #F5F7F5;
+
+  /* Text */
+  --color-text-primary:   #1A2E22;
+  --color-text-secondary: #4A6357;
+  --color-text-muted:     #8AA396;
+  --color-text-inverse:   #FFFFFF;
+
+  /* Borders */
+  --color-border:        rgba(26, 107, 58, 0.12);
+  --color-border-strong: rgba(26, 107, 58, 0.25);
+
+  /* Card shadow tokens */
+  --shadow-card:       0 1px 3px rgba(26, 46, 34, 0.04), 0 1px 2px rgba(26, 46, 34, 0.06);
+  --shadow-card-hover: 0 4px 12px rgba(26, 46, 34, 0.08), 0 2px 4px rgba(26, 46, 34, 0.04);
+
+  /* Semantic */
+  --color-success: #3AA870;
+  --color-warning: #E07B3A;
+  --color-danger:  #E24B4A;
+  --color-info:    #4A90D9;
+
+  /*
+   * Chart palette — colorblind-safe (deuteranopia tested)
+   * Rule: never use two greens in the same chart
+   */
+
+  /* Bar chart: KTH class (Utama / Madya / Pemula) */
+  --chart-utama:  #1A6B3A;  /* dark green  */
+  --chart-madya:  #E07B3A;  /* orange      */
+  --chart-pemula: #4A90D9;  /* blue        */
+
+  /* Donut chart: KPS scheme */
+  --chart-hkm:   #7B5EA7;  /* purple  — HKm      */
+  --chart-hd:    #E07B3A;  /* orange  — HD       */
+  --chart-kulin: #1A6B3A;  /* green   — Kulin KK */
+  --chart-iphps: #17A77E;  /* teal    — IPHPS    */
+
+  /* Extra chart colors for future charts */
+  --chart-5: #E24B4A;  /* red    */
+  --chart-6: #F0C040;  /* yellow */
+  --chart-7: #5BC0DE;  /* cyan   */
+}
+
+/* Apply page background globally */
+body {
+  background-color: var(--color-bg-page) !important;
+}
+
+/* Apply card shadows to common card patterns */
+.bg-white.rounded-xl,
+.bg-white.rounded-2xl {
+  box-shadow: var(--shadow-card);
+  border-color: var(--color-border) !important;
+}
