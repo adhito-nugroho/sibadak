@@ -129,4 +129,33 @@ class Kbr extends BaseModel
         $val = $stmt->fetchColumn();
         return $val !== false && $val !== null ? (int) $val : null;
     }
+
+    /**
+     * @param list<int> $ids
+     * @return list<array<string,mixed>>
+     */
+    public function findByIds(array $ids, ?int $operatorKabId = null): array
+    {
+        $ids = bulk_parse_ids($ids);
+        if ($ids === []) {
+            return [];
+        }
+        $in = bulk_in_clause($ids);
+        $params = $in['params'];
+        $where = 'kbr.id IN (' . $in['sql'] . ')';
+        if ($operatorKabId !== null) {
+            $where .= ' AND kbr.kth_id IN (SELECT id FROM kth WHERE kabupaten_id = ?)';
+            $params[] = $operatorKabId;
+        }
+        $sql = 'SELECT kbr.*, ds.nama AS desa_nama,
+                kec.nama AS kecamatan_nama, kb.nama AS kabupaten_nama
+            FROM kbr
+            LEFT JOIN desa ds ON kbr.desa_id = ds.id
+            LEFT JOIN kecamatan kec ON ds.kecamatan_id = kec.id
+            LEFT JOIN kabupaten kb ON kec.kabupaten_id = kb.id
+            WHERE ' . $where . '
+            ORDER BY kbr.tahun_tanam DESC, kbr.id DESC';
+
+        return $this->query($sql, $params);
+    }
 }

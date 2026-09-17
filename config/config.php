@@ -8,6 +8,22 @@ $root = dirname(__DIR__);
 
 require_once $root . '/vendor/autoload.php';
 
+// Fallback autoload untuk controllers/ & models/ agar class baru
+// tetap ketemu walau vendor/composer/autoload_classmap.php di server
+// belum di-regenerate (vendor/ di-gitignore). Composer tetap prioritas utama.
+spl_autoload_register(static function (string $class) use ($root): void {
+    if (preg_match('/[^A-Za-z0-9_]/', $class) === 1) {
+        return;
+    }
+    foreach (['/controllers/', '/models/'] as $dir) {
+        $file = $root . $dir . $class . '.php';
+        if (is_file($file)) {
+            require_once $file;
+            return;
+        }
+    }
+});
+
 if (is_readable($root . '/.env')) {
     Dotenv::createImmutable($root)->safeLoad();
 }

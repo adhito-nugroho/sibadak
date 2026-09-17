@@ -213,4 +213,37 @@ class RkpsController
         header('Location: ' . APP_URL . '/rkps');
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/rkps', 'RKPS');
+        $rows = $this->model()->findByIds($ids, $this->opKabId());
+        if ($rows === []) {
+            bulk_flash_redirect('/rkps', 'error', 'Tidak ada data RKPS yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/rkps', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['nama_lembaga'] ?? ''),
+                (string) ($r['kabupaten_nama'] ?? ''),
+                (int) ($r['periode_awal'] ?? 0) . '–' . (int) ($r['periode_akhir'] ?? 0),
+                (string) ($r['status'] ?? ''),
+                !empty($r['dokumen_link']) ? (string) $r['dokumen_link'] : '',
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data RKPS',
+            ['KPS', 'Kabupaten', 'Periode', 'Status', 'Dokumen'],
+            $dataRows,
+            'sibadak-rkps',
+            $this->pdo(),
+            'rkps'
+        );
+    }
 }

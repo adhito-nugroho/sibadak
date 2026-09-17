@@ -386,4 +386,37 @@ class KbrController
         header('Location: ' . APP_URL . '/kbr/' . $kbrId);
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/kbr', 'KBR');
+        $rows = $this->model()->findByIds($ids, $this->opKabId());
+        if ($rows === []) {
+            bulk_flash_redirect('/kbr', 'error', 'Tidak ada data KBR yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/kbr', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['nama_kth'] ?? ''),
+                (string) ($r['kabupaten_nama'] ?? ''),
+                (string) ($r['desa_nama'] ?? ''),
+                (string) ($r['subdas'] ?? ''),
+                (int) ($r['tahun_tanam'] ?? 0),
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data KBR',
+            ['Nama KTH', 'Kabupaten', 'Desa', 'SubDAS', 'Tahun'],
+            $dataRows,
+            'sibadak-kbr',
+            $this->pdo(),
+            'kbr'
+        );
+    }
 }

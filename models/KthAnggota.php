@@ -132,4 +132,31 @@ class KthAnggota extends BaseModel
     {
         return self::POSISI_ORDER;
     }
+
+    /**
+     * @param list<int> $ids
+     * @return list<array<string,mixed>>
+     */
+    public function findByIds(array $ids, ?int $operatorKabId = null): array
+    {
+        $ids = bulk_parse_ids($ids);
+        if ($ids === []) {
+            return [];
+        }
+        $in = bulk_in_clause($ids);
+        $params = $in['params'];
+        $where = 'a.id IN (' . $in['sql'] . ') AND k.is_active = 1';
+        if ($operatorKabId !== null) {
+            $where .= ' AND k.kabupaten_id = ?';
+            $params[] = $operatorKabId;
+        }
+        $sql = 'SELECT a.*, k.nama AS kth_nama, k.kode_register AS kth_kode, kb.nama AS kabupaten_nama
+            FROM kth_anggota a
+            INNER JOIN kth k ON a.kth_id = k.id
+            INNER JOIN kabupaten kb ON k.kabupaten_id = kb.id
+            WHERE ' . $where . '
+            ORDER BY a.nama ASC';
+
+        return $this->query($sql, $params);
+    }
 }

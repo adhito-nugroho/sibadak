@@ -64,4 +64,24 @@ class GullyPlug extends BaseModel
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $row === false ? false : $row;
     }
+
+    /**
+     * @param list<int> $ids
+     * @return list<array<string,mixed>>
+     */
+    public function findByIds(array $ids): array
+    {
+        $ids = bulk_parse_ids($ids);
+        if ($ids === []) {
+            return [];
+        }
+        $in = bulk_in_clause($ids);
+        $sql = 'SELECT gully_plug.*, ds.nama AS desa_nama
+            FROM gully_plug
+            LEFT JOIN desa ds ON gully_plug.desa_id = ds.id
+            WHERE gully_plug.id IN (' . $in['sql'] . ')
+            ORDER BY gully_plug.tahun DESC, gully_plug.id DESC';
+
+        return $this->query($sql, $in['params']);
+    }
 }

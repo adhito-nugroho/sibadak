@@ -395,4 +395,38 @@ class KelembagaanController
         header('Location: ' . APP_URL . '/kelembagaan');
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/kelembagaan', 'anggota');
+        $rows = $this->anggotaModel()->findByIds($ids, $this->opKabId());
+        if ($rows === []) {
+            bulk_flash_redirect('/kelembagaan', 'error', 'Tidak ada data kelembagaan yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/kelembagaan', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['nama'] ?? ''),
+                (string) ($r['posisi'] ?? ''),
+                (string) ($r['kth_nama'] ?? ''),
+                (string) ($r['kth_kode'] ?? ''),
+                (string) ($r['kabupaten_nama'] ?? ''),
+                (string) ($r['nik'] ?? ''),
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data Kelembagaan',
+            ['Nama', 'Posisi', 'KTH', 'Kode Register', 'Kabupaten', 'NIK'],
+            $dataRows,
+            'sibadak-kelembagaan',
+            $this->pdo(),
+            'kelembagaan'
+        );
+    }
 }

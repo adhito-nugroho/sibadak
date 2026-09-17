@@ -379,4 +379,38 @@ class RktController
         header('Location: ' . APP_URL . '/rkt');
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/rkt', 'RKT');
+        $rows = $this->model()->findByIds($ids, $this->opKabId());
+        if ($rows === []) {
+            bulk_flash_redirect('/rkt', 'error', 'Tidak ada data RKT yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/rkt', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['kps_nama'] ?? ''),
+                (string) ($r['kps_no_sk'] ?? ''),
+                (string) ($r['kabupaten_nama'] ?? ''),
+                (int) ($r['tahun'] ?? 0),
+                (string) ($r['status'] ?? ''),
+                !empty($r['dokumen_link']) ? (string) $r['dokumen_link'] : '',
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data RKT',
+            ['KPS', 'No. SK', 'Kabupaten', 'Tahun', 'Status', 'Dokumen'],
+            $dataRows,
+            'sibadak-rkt',
+            $this->pdo(),
+            'rkt'
+        );
+    }
 }

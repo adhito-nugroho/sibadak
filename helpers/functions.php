@@ -56,6 +56,28 @@ function format_id(int|float $n, int $decimals = 0): string
 }
 
 /**
+ * Empty cell marker for data tables (muted em dash).
+ */
+function table_empty_hint(string $title = 'Kosong'): string
+{
+    $t = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+    return '<span class="num-empty-hint" title="' . $t . '">—</span>';
+}
+
+/**
+ * Year pill: current calendar year = green, otherwise muted gray.
+ */
+function table_year_badge(?int $year): string
+{
+    if ($year === null || $year <= 0) {
+        return table_empty_hint('Tahun kosong');
+    }
+    $current = (int) date('Y');
+    $cls = $year === $current ? 'badge-tahun badge-tahun-current' : 'badge-tahun badge-tahun-past';
+    return '<span class="' . $cls . '">' . $year . '</span>';
+}
+
+/**
  * Donut chart arcs (Skema KPS). Warna harus hex aman (sumber server).
  *
  * @param list<array{jumlah:int,warna:string}> $segments
@@ -214,3 +236,5 @@ function request_path(): string
 
     return $path === '' ? '/' : '/' . $path;
 }
+
+require_once __DIR__ . '/bulk_export.php';

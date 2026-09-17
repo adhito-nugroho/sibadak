@@ -156,4 +156,37 @@ class GullyPlugController
         header('Location: ' . APP_URL . '/gully-plug');
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/gully-plug', 'Gully Plug');
+        $rows = $this->model()->findByIds($ids);
+        if ($rows === []) {
+            bulk_flash_redirect('/gully-plug', 'error', 'Tidak ada data Gully Plug yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/gully-plug', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['sasaran'] ?? ''),
+                (string) ($r['lokasi'] ?? ''),
+                (string) ($r['subdas'] ?? ''),
+                (int) ($r['jumlah_unit'] ?? 0),
+                (int) ($r['tahun'] ?? 0),
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data Gully Plug',
+            ['Sasaran', 'Lokasi', 'SubDAS', 'Unit', 'Tahun'],
+            $dataRows,
+            'sibadak-gully-plug',
+            $this->pdo(),
+            'gully_plug'
+        );
+    }
 }

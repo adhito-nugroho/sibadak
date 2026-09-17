@@ -437,4 +437,62 @@ class KthController
         header('Location: ' . APP_URL . '/kth');
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/kth', 'KTH');
+
+        $m = $this->model();
+        $opKab = $this->opKabId();
+        $rows = $m->findByIds($ids, $opKab);
+
+        if ($rows === []) {
+            bulk_flash_redirect('/kth', 'error', 'Tidak ada data KTH yang cocok untuk dipilih.');
+        }
+
+        $validIds = array_map(static fn (array $r): int => (int) $r['id'], $rows);
+
+        if ($action === 'export') {
+            $dataRows = [];
+            $no = 1;
+            foreach ($rows as $r) {
+                $dataRows[] = [
+                    $no++,
+                    (string) ($r['nama'] ?? ''),
+                    (string) ($r['kode_register'] ?? ''),
+                    (string) ($r['kelas'] ?? ''),
+                    (string) ($r['kabupaten_nama'] ?? ''),
+                    (string) ($r['kecamatan_nama'] ?? ''),
+                    (string) ($r['desa_nama'] ?? ''),
+                    (int) ($r['jumlah_anggota'] ?? 0),
+                ];
+            }
+            bulk_stream_xlsx(
+                'Data KTH',
+                ['No', 'Nama KTH', 'Kode Register', 'Kelas', 'Kabupaten', 'Kecamatan', 'Desa', 'Jumlah Anggota'],
+                $dataRows,
+                'sibadak-kth',
+                $this->pdo(),
+                'kth'
+            );
+        }
+
+        if ($action === 'deactivate') {
+            require_can_mutate_data();
+            $n = $m->softDeleteMany($validIds, $opKab);
+            log_activity(
+                $this->pdo(),
+                'kth',
+                'bulk_deactivate',
+                'Nonaktifkan ' . $n . ' KTH: ' . implode(',', $validIds)
+            );
+            bulk_flash_redirect('/kth', 'success', $n . ' KTH berhasil dinonaktifkan.');
+        }
+
+        bulk_flash_redirect('/kth', 'error', 'Aksi massal tidak dikenal.');
+    }
 }

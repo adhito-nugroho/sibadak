@@ -5,3 +5,5 @@ Thumbs.db
 *.log
 .idea/
 .vscode/
+db_export_temp.sql
+

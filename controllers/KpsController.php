@@ -508,4 +508,39 @@ class KpsController
         header('Location: ' . APP_URL . '/kps');
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/kps', 'KPS');
+        $rows = $this->model()->findByIds($ids, $this->opKabId());
+        if ($rows === []) {
+            bulk_flash_redirect('/kps', 'error', 'Tidak ada data KPS yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/kps', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['nama_lembaga'] ?? ''),
+                (string) ($r['no_sk'] ?? ''),
+                (string) ($r['skema'] ?? ''),
+                (string) ($r['kabupaten_nama'] ?? ''),
+                (string) ($r['desa_nama'] ?? ''),
+                $r['luas_wilayah_ha'] !== null ? (float) $r['luas_wilayah_ha'] : '',
+                (int) ($r['jumlah_kk'] ?? 0),
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data KPS',
+            ['Nama lembaga', 'No. SK', 'Skema', 'Kabupaten', 'Desa', 'Luas (Ha)', 'KK'],
+            $dataRows,
+            'sibadak-kps',
+            $this->pdo(),
+            'kps'
+        );
+    }
 }

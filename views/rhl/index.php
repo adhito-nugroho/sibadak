@@ -21,21 +21,22 @@ $qsBase = static function (array $extra): string {
     return http_build_query($p);
 };
 ?>
-<div class="flex flex-wrap items-center justify-between gap-4 mb-6 fade-up">
-    <div>
-        <h2 class="font-display font-700 text-gray-800 text-lg">Data RHL</h2>
-        <p class="text-xs text-gray-400 mt-0.5">Rehabilitasi Hutan &amp; Lahan · <?= format_id($total) ?> entri</p>
-    </div>
+<div class="page-toolbar fade-up">
+    <p class="page-toolbar-meta">
+        Rehabilitasi Hutan &amp; Lahan · <strong><?= format_id($total) ?></strong> entri · halaman <?= $cur ?>/<?= max(1, $pages) ?>
+    </p>
     <?php if ($canMut): ?>
-    <a href="<?= htmlspecialchars(APP_URL . '/rhl/create', ENT_QUOTES, 'UTF-8') ?>" class="inline-flex items-center gap-2 px-4 py-2 bg-forest-600 hover:bg-forest-700 text-white text-sm font-600 rounded-xl transition shadow-sm">+ Tambah RHL</a>
+    <a href="<?= htmlspecialchars(APP_URL . '/rhl/create', ENT_QUOTES, 'UTF-8') ?>" class="btn-primary-add">
+        <i class="ti ti-plus text-sm leading-none"></i> Tambah RHL
+    </a>
     <?php endif; ?>
 </div>
 
-<form method="get" action="<?= htmlspecialchars(APP_URL . '/rhl', ENT_QUOTES, 'UTF-8') ?>" class="stat-card p-4 mb-6 fade-up delay-1 grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+<form method="get" action="<?= htmlspecialchars(APP_URL . '/rhl', ENT_QUOTES, 'UTF-8') ?>" class="filter-bar fade-up delay-1">
     <?php if (user_role() !== 'operator'): ?>
-    <div class="md:col-span-2">
-        <label class="block text-xs font-600 text-gray-500 mb-1">Kabupaten</label>
-        <select name="kabupaten_id" class="w-full text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white outline-none">
+    <div class="filter-field filter-field-kab">
+        <label for="f-kab">Kabupaten</label>
+        <select id="f-kab" name="kabupaten_id">
             <option value="">Semua</option>
             <?php foreach ($kabupatenList as $kb): ?>
             <option value="<?= (int) $kb['id'] ?>" <?= $filterKab === (int) $kb['id'] ? 'selected' : '' ?>><?= htmlspecialchars($kb['nama'], ENT_QUOTES, 'UTF-8') ?></option>
@@ -43,70 +44,96 @@ $qsBase = static function (array $extra): string {
         </select>
     </div>
     <?php endif; ?>
-    <div class="md:col-span-2">
-        <label class="block text-xs font-600 text-gray-500 mb-1">Tahun</label>
-        <select name="tahun" class="w-full text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white outline-none">
+    <div class="filter-field filter-field-sm">
+        <label for="f-tahun">Tahun</label>
+        <select id="f-tahun" name="tahun">
             <option value="">Semua</option>
             <?php foreach ($yearOptions as $th): ?>
             <option value="<?= $th ?>" <?= $filterTahun === $th ? 'selected' : '' ?>><?= $th ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="md:col-span-2">
-        <label class="block text-xs font-600 text-gray-500 mb-1">Sumber Dana</label>
-        <select name="sumber_dana" class="w-full text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white outline-none">
+    <div class="filter-field filter-field-md">
+        <label for="f-dana">Sumber Dana</label>
+        <select id="f-dana" name="sumber_dana">
             <option value="">Semua</option>
             <?php foreach ($sumberDanaOptions as $sd): ?>
             <option value="<?= htmlspecialchars($sd, ENT_QUOTES, 'UTF-8') ?>" <?= $filterSumberDana === $sd ? 'selected' : '' ?>><?= htmlspecialchars($sd, ENT_QUOTES, 'UTF-8') ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="md:col-span-3">
-        <label class="block text-xs font-600 text-gray-500 mb-1">Kegiatan</label>
-        <select name="kegiatan" class="w-full text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white outline-none">
+    <div class="filter-field filter-field-lg">
+        <label for="f-keg">Kegiatan</label>
+        <select id="f-keg" name="kegiatan">
             <option value="">Semua</option>
             <?php foreach ($kegiatanOptions as $k): ?>
             <option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>" <?= $filterKegiatan === $k ? 'selected' : '' ?>><?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="md:col-span-2">
-        <label class="block text-xs font-600 text-gray-500 mb-1">Cari</label>
-        <input type="text" name="q" value="<?= htmlspecialchars($filterQ, ENT_QUOTES, 'UTF-8') ?>" class="w-full text-sm px-3 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Cari pelaksana...">
+    <div class="filter-field filter-field-q">
+        <label for="f-q">Filter dalam tabel</label>
+        <input id="f-q" type="search" name="q" value="<?= htmlspecialchars($filterQ, ENT_QUOTES, 'UTF-8') ?>" placeholder="Nama pelaksana…">
     </div>
-    <div class="md:col-span-1"><button type="submit" class="w-full px-3 py-2 rounded-xl bg-forest-600 text-white text-sm font-600">OK</button></div>
+    <div class="filter-actions">
+        <button type="submit" class="btn-apply">Terapkan</button>
+        <a href="<?= htmlspecialchars(APP_URL . '/rhl', ENT_QUOTES, 'UTF-8') ?>" class="btn-reset">Reset</a>
+    </div>
 </form>
 
 <div class="stat-card overflow-hidden fade-up delay-2">
     <div class="overflow-x-auto">
-        <table class="data-table w-full">
-            <thead><tr class="border-b border-gray-100"><th class="px-4 py-3 text-left">Pelaksana</th><th class="px-4 py-3 text-left">Kabupaten</th><th class="px-4 py-3 text-left">Kegiatan</th><th class="px-4 py-3 text-left">Tahun</th><th class="px-4 py-3 text-left">Sumber Dana</th><th class="px-4 py-3 text-right">Luas (Ha)</th><th class="px-4 py-3 text-right">Aksi</th></tr></thead>
-            <tbody class="divide-y divide-gray-50">
-            <?php if ($rows === []): ?>
-                <tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Tidak ada data.</td></tr>
-            <?php else: foreach ($rows as $r): ?>
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <td class="px-4 py-3 text-gray-800"><?= htmlspecialchars((string) $r['nama_kth'], ENT_QUOTES, 'UTF-8') ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-600"><?= htmlspecialchars((string) $r['kabupaten_nama'], ENT_QUOTES, 'UTF-8') ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-600"><?= htmlspecialchars((string) $r['kegiatan'], ENT_QUOTES, 'UTF-8') ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-700"><?= (int) $r['tahun'] ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-600"><?= htmlspecialchars((string) ($r['sumber_dana'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
-                    <td class="px-4 py-3 text-right text-sm text-gray-700"><?= $r['luas_ha'] !== null ? format_id((float) $r['luas_ha'], 2) : '—' ?></td>
-                    <td class="px-4 py-3 text-right"><a href="<?= htmlspecialchars(APP_URL . '/rhl/' . (int) $r['id'], ENT_QUOTES, 'UTF-8') ?>" class="text-xs font-600 text-forest-600 hover:underline">Detail</a></td>
+                    <th class="text-left">Pelaksana</th>
+                    <th class="text-left">Kabupaten</th>
+                    <th class="text-left">Kegiatan</th>
+                    <th class="text-left">Tahun</th>
+                    <th class="text-left">Sumber Dana</th>
+                    <th class="text-right">Luas (Ha)</th>
+                    <th class="col-aksi">Aksi</th>
                 </tr>
-            <?php endforeach; endif; ?>
+            </thead>
+            <tbody>
+                <?php if ($rows === []): ?>
+                <tr>
+                    <td colspan="7" class="cell-empty">
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="ti ti-seedling"></i></div>
+                            <p class="empty-state-title">Belum ada RHL yang cocok</p>
+                            <p class="empty-state-desc">Ubah filter atau reset pencarian untuk menampilkan data rehabilitasi hutan &amp; lahan.</p>
+                        </div>
+                    </td>
+                </tr>
+                <?php else: foreach ($rows as $r): ?>
+                <tr>
+                    <td class="font-medium text-gray-800" title="<?= htmlspecialchars((string) $r['nama_kth'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string) $r['nama_kth'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars((string) $r['kabupaten_nama'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td title="<?= htmlspecialchars((string) $r['kegiatan'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string) $r['kegiatan'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><span class="num-active"><?= (int) $r['tahun'] ?></span></td>
+                    <td><?= htmlspecialchars((string) ($r['sumber_dana'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
+                    <td class="text-right"><?= $r['luas_ha'] !== null ? '<span class="num-active">' . format_id((float) $r['luas_ha'], 2) . '</span>' : '<span class="num-empty-hint">—</span>' ?></td>
+                    <td class="col-aksi">
+                        <div class="inline-flex items-center gap-1 justify-end">
+                            <a href="<?= htmlspecialchars(APP_URL . '/rhl/' . (int) $r['id'], ENT_QUOTES, 'UTF-8') ?>" class="btn-icon" title="Detail"><i class="ti ti-eye"></i></a>
+                            <?php if ($canMut): ?>
+                            <a href="<?= htmlspecialchars(APP_URL . '/rhl/' . (int) $r['id'] . '/edit', ENT_QUOTES, 'UTF-8') ?>" class="btn-icon btn-icon-muted" title="Edit"><i class="ti ti-pencil"></i></a>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; endif; ?>
             </tbody>
         </table>
     </div>
     <?php if ($pages > 1): ?>
-    <div class="px-4 py-3 border-t border-gray-100 flex flex-wrap justify-center gap-2 text-sm">
-        <?php if ($cur > 1): ?>
-        <a class="px-3 py-1 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50" href="?<?= htmlspecialchars($qsBase(['page' => $cur - 1]), ENT_QUOTES, 'UTF-8') ?>">« Prev</a>
-        <?php endif; ?>
-        <span class="px-3 py-1 text-gray-500"><?= $cur ?> / <?= $pages ?></span>
-        <?php if ($cur < $pages): ?>
-        <a class="px-3 py-1 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50" href="?<?= htmlspecialchars($qsBase(['page' => $cur + 1]), ENT_QUOTES, 'UTF-8') ?>">Next »</a>
-        <?php endif; ?>
+    <div class="pager">
+        <span class="pager-meta">Halaman <?= $cur ?> dari <?= $pages ?></span>
+        <div class="pager-links">
+            <?php if ($cur > 1): ?><a href="?<?= htmlspecialchars($qsBase(['page' => $cur - 1]), ENT_QUOTES, 'UTF-8') ?>">« Prev</a><?php endif; ?>
+            <?php if ($cur < $pages): ?><a href="?<?= htmlspecialchars($qsBase(['page' => $cur + 1]), ENT_QUOTES, 'UTF-8') ?>">Next »</a><?php endif; ?>
+        </div>
     </div>
     <?php endif; ?>
 </div>

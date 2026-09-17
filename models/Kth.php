@@ -105,6 +105,70 @@ class Kth extends BaseModel
         return $stmt->execute([$id]);
     }
 
+    /**
+     * @param list<int> $ids
+     * @return list<array<string, mixed>>
+     */
+    public function findByIds(array $ids, ?int $operatorKabId = null): array
+    {
+        $ids = array_values(array_unique(array_filter(
+            array_map(static fn ($v): int => (int) $v, $ids),
+            static fn (int $id): bool => $id > 0
+        )));
+        if ($ids === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $params = $ids;
+        $where = 'kth.id IN (' . $placeholders . ') AND kth.is_active = 1';
+        if ($operatorKabId !== null) {
+            $where .= ' AND kth.kabupaten_id = ?';
+            $params[] = $operatorKabId;
+        }
+
+        $sql = 'SELECT kth.*, kb.nama AS kabupaten_nama, kc.nama AS kecamatan_nama, ds.nama AS desa_nama
+            FROM kth
+            INNER JOIN kabupaten kb ON kth.kabupaten_id = kb.id
+            INNER JOIN kecamatan kc ON kth.kecamatan_id = kc.id
+            INNER JOIN desa ds ON kth.desa_id = ds.id
+            WHERE ' . $where . '
+            ORDER BY kth.nama ASC';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Soft-delete banyak KTH sekaligus.
+     *
+     * @param list<int> $ids
+     */
+    public function softDeleteMany(array $ids, ?int $operatorKabId = null): int
+    {
+        $ids = array_values(array_unique(array_filter(
+            array_map(static fn ($v): int => (int) $v, $ids),
+            static fn (int $id): bool => $id > 0
+        )));
+        if ($ids === []) {
+            return 0;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $params = $ids;
+        $sql = 'UPDATE kth SET is_active = 0 WHERE id IN (' . $placeholders . ') AND is_active = 1';
+        if ($operatorKabId !== null) {
+            $sql .= ' AND kabupaten_id = ?';
+            $params[] = $operatorKabId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->rowCount();
+    }
+
     /** @return list<array{id:int,kode:string,nama:string}> */
     public function listKabupatenForFilter(): array
     {

@@ -133,4 +133,37 @@ class PenyuluhKehutananController
             'is_active' => isset($_POST['is_active']) ? 1 : 0,
         ];
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/penyuluh', 'penyuluh');
+        $rows = $this->model()->findByIds($ids);
+        if ($rows === []) {
+            bulk_flash_redirect('/penyuluh', 'error', 'Tidak ada data penyuluh yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/penyuluh', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['nip'] ?? ''),
+                (string) ($r['nama'] ?? ''),
+                (string) ($r['pangkat'] ?? ''),
+                (string) ($r['jabatan'] ?? ''),
+                ((int) ($r['is_active'] ?? 0) === 1) ? 'Aktif' : 'Nonaktif',
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data Penyuluh',
+            ['NIP', 'Nama', 'Pangkat', 'Jabatan', 'Status'],
+            $dataRows,
+            'sibadak-penyuluh',
+            $this->pdo(),
+            'penyuluh'
+        );
+    }
 }

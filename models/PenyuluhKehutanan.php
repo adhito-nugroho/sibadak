@@ -58,4 +58,22 @@ class PenyuluhKehutanan extends BaseModel
 
         return $this->query($sql);
     }
+
+    /**
+     * @param list<int> $ids
+     * @return list<array<string,mixed>>
+     */
+    public function findByIds(array $ids): array
+    {
+        $ids = bulk_parse_ids($ids);
+        if ($ids === []) {
+            return [];
+        }
+        $in = bulk_in_clause($ids);
+        $sql = 'SELECT * FROM penyuluh_kehutanan
+            WHERE id IN (' . $in['sql'] . ')
+            ORDER BY nama ASC';
+
+        return $this->query($sql, $in['params']);
+    }
 }

@@ -185,4 +185,32 @@ class RktKps extends BaseModel
             'latest_status' => $latest['status'] ?? null,
         ];
     }
+
+    /**
+     * @param list<int> $ids
+     * @return list<array<string,mixed>>
+     */
+    public function findByIds(array $ids, ?int $operatorKabId = null): array
+    {
+        $ids = bulk_parse_ids($ids);
+        if ($ids === []) {
+            return [];
+        }
+        $in = bulk_in_clause($ids);
+        $params = $in['params'];
+        $where = 'r.id IN (' . $in['sql'] . ')';
+        if ($operatorKabId !== null) {
+            $where .= ' AND k.kabupaten_id = ?';
+            $params[] = $operatorKabId;
+        }
+        $sql = 'SELECT r.*, k.nama_lembaga AS kps_nama, k.no_sk AS kps_no_sk,
+            k.kabupaten_id, kb.nama AS kabupaten_nama
+            FROM kps_rkt r
+            INNER JOIN kps k ON r.kps_id = k.id
+            INNER JOIN kabupaten kb ON k.kabupaten_id = kb.id
+            WHERE ' . $where . '
+            ORDER BY r.tahun DESC, k.nama_lembaga ASC';
+
+        return $this->query($sql, $params);
+    }
 }

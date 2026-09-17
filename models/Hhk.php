@@ -125,4 +125,32 @@ class Hhk extends BaseModel
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $row === false ? false : $row;
     }
+
+    /**
+     * @param list<int> $ids
+     * @return list<array<string,mixed>>
+     */
+    public function findByIds(array $ids, ?int $operatorKabId = null): array
+    {
+        $ids = bulk_parse_ids($ids);
+        if ($ids === []) {
+            return [];
+        }
+        $in = bulk_in_clause($ids);
+        $params = $in['params'];
+        $where = 'h.id IN (' . $in['sql'] . ')';
+        if ($operatorKabId !== null) {
+            $where .= ' AND h.kabupaten_id = ?';
+            $params[] = $operatorKabId;
+        }
+        $sql = 'SELECT h.*, kb.nama AS kabupaten_nama, kc.nama AS kecamatan_nama, ds.nama AS desa_nama
+            FROM hhk h
+            LEFT JOIN kabupaten kb ON h.kabupaten_id = kb.id
+            LEFT JOIN kecamatan kc ON h.kecamatan_id = kc.id
+            LEFT JOIN desa ds ON h.desa_id = ds.id
+            WHERE ' . $where . '
+            ORDER BY h.tahun DESC, h.bulan DESC, h.id DESC';
+
+        return $this->query($sql, $params);
+    }
 }

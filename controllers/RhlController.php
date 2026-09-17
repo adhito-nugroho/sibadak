@@ -514,4 +514,38 @@ class RhlController
         header('Location: ' . APP_URL . '/rhl/' . $rhlId);
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/rhl', 'RHL');
+        $rows = $this->model()->findByIds($ids, $this->opKabId());
+        if ($rows === []) {
+            bulk_flash_redirect('/rhl', 'error', 'Tidak ada data RHL yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/rhl', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['nama_kth'] ?? ''),
+                (string) ($r['kabupaten_nama'] ?? ''),
+                (string) ($r['kegiatan'] ?? ''),
+                (int) ($r['tahun'] ?? 0),
+                (string) ($r['sumber_dana'] ?? ''),
+                $r['luas_ha'] !== null ? (float) $r['luas_ha'] : '',
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data RHL',
+            ['Pelaksana', 'Kabupaten', 'Kegiatan', 'Tahun', 'Sumber Dana', 'Luas (Ha)'],
+            $dataRows,
+            'sibadak-rhl',
+            $this->pdo(),
+            'rhl'
+        );
+    }
 }

@@ -310,4 +310,37 @@ class AepController
         header('Location: ' . APP_URL . '/aep');
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/aep', 'AEP');
+        $rows = $this->model()->findByIds($ids, $this->opKabId());
+        if ($rows === []) {
+            bulk_flash_redirect('/aep', 'error', 'Tidak ada data AEP yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/aep', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['nama_kth'] ?? ''),
+                (string) ($r['kabupaten_nama'] ?? ''),
+                (string) ($r['jenis_bantuan'] ?? ''),
+                (int) ($r['jumlah'] ?? 0),
+                (int) ($r['tahun'] ?? 0),
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data AEP',
+            ['Nama KTH', 'Kabupaten', 'Jenis Bantuan', 'Jumlah', 'Tahun'],
+            $dataRows,
+            'sibadak-aep',
+            $this->pdo(),
+            'aep'
+        );
+    }
 }

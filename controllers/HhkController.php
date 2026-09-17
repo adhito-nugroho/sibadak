@@ -253,4 +253,41 @@ class HhkController
         set_flash('success', 'Rincian berhasil dihapus.');
         header('Location: ' . APP_URL . '/hhk/' . $hhkId); exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/hhk', 'HHK');
+        $rows = $this->model()->findByIds($ids, $this->opKabId());
+        if ($rows === []) {
+            bulk_flash_redirect('/hhk', 'error', 'Tidak ada data HHK yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/hhk', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $bulanList = Hhk::bulanList();
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $bln = (int) ($r['bulan'] ?? 0);
+            $periode = ($bulanList[$bln] ?? (string) $bln) . ' ' . (int) ($r['tahun'] ?? 0);
+            $dataRows[] = [
+                (string) ($r['nama_kth'] ?? ''),
+                (string) ($r['kabupaten_nama'] ?? ''),
+                (string) ($r['nama_penyuluh'] ?? ''),
+                $periode,
+                (float) ($r['total_bulan_ini_m3'] ?? 0),
+                (float) ($r['total_sd_bulan_ini_m3'] ?? 0),
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data HHK',
+            ['KTH/Pelaksana', 'Wilayah', 'Penyuluh', 'Periode', 'Total Bulan Ini (m3)', 'Total s.d. Bulan Ini (m3)'],
+            $dataRows,
+            'sibadak-hhk',
+            $this->pdo(),
+            'hhk'
+        );
+    }
 }

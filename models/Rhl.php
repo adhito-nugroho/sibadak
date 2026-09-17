@@ -140,4 +140,31 @@ class Rhl extends BaseModel
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $row === false ? false : $row;
     }
+
+    /**
+     * @param list<int> $ids
+     * @return list<array<string,mixed>>
+     */
+    public function findByIds(array $ids, ?int $operatorKabId = null): array
+    {
+        $ids = bulk_parse_ids($ids);
+        if ($ids === []) {
+            return [];
+        }
+        $in = bulk_in_clause($ids);
+        $params = $in['params'];
+        $where = 'rhl.id IN (' . $in['sql'] . ')';
+        if ($operatorKabId !== null) {
+            $where .= ' AND rhl.kabupaten_id = ?';
+            $params[] = $operatorKabId;
+        }
+        $sql = 'SELECT rhl.*, kb.nama AS kabupaten_nama, ds.nama AS desa_nama
+            FROM rhl
+            INNER JOIN kabupaten kb ON rhl.kabupaten_id = kb.id
+            LEFT JOIN desa ds ON rhl.desa_id = ds.id
+            WHERE ' . $where . '
+            ORDER BY rhl.tahun DESC, rhl.id DESC';
+
+        return $this->query($sql, $params);
+    }
 }

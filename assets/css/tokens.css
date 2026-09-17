@@ -6,12 +6,10 @@
   --color-primary-surface: #E8F5EC;
 
   /* Page structure — better contrast with white cards */
-  --color-bg-page:    #EEF2EE;  /* warm sage gray, kontras kuat dengan card putih */
+  --color-bg-page:    #EEF2EE;
   --color-bg-surface: #FFFFFF;
   --color-bg-sidebar: #1A3A28;
   --color-bg-sidebar-active: #2D5A3D;
-
-  /* Subtle surface for nested areas */
   --color-bg-subtle:  #F5F7F5;
 
   /* Text */
@@ -35,33 +33,42 @@
   --color-info:    #4A90D9;
 
   /*
-   * Chart palette — colorblind-safe (deuteranopia tested)
-   * Rule: never use two greens in the same chart
+   * Chart / badge palette — KTH class semantics
+   * Utama = gold, Madya = hijau, Pemula = slate netral
    */
+  --chart-utama:  #C9A227;
+  --chart-madya:  #1A6B3A;
+  --chart-pemula: #64748B;
 
-  /* Bar chart: KTH class (Utama / Madya / Pemula) */
-  --chart-utama:  #1A6B3A;  /* dark green  */
-  --chart-madya:  #E07B3A;  /* orange      */
-  --chart-pemula: #4A90D9;  /* blue        */
+  --badge-utama-bg:  #fef3c7;
+  --badge-utama-fg:  #92400e;
+  --badge-utama-bd:  #fcd34d;
+  --badge-madya-bg:  #dcfce7;
+  --badge-madya-fg:  #166534;
+  --badge-madya-bd:  #86efac;
+  --badge-pemula-bg: #f1f5f9;
+  --badge-pemula-fg: #475569;
+  --badge-pemula-bd: #e2e8f0;
 
   /* Donut chart: KPS scheme */
-  --chart-hkm:   #7B5EA7;  /* purple  — HKm      */
-  --chart-hd:    #E07B3A;  /* orange  — HD       */
-  --chart-kulin: #1A6B3A;  /* green   — Kulin KK */
-  --chart-iphps: #17A77E;  /* teal    — IPHPS    */
+  --chart-hkm:   #7B5EA7;
+  --chart-hd:    #E07B3A;
+  --chart-kulin: #1A6B3A;
+  --chart-iphps: #17A77E;
 
-  /* Extra chart colors for future charts */
-  --chart-5: #E24B4A;  /* red    */
-  --chart-6: #F0C040;  /* yellow */
-  --chart-7: #5BC0DE;  /* cyan   */
+  --chart-5: #E24B4A;
+  --chart-6: #F0C040;
+  --chart-7: #5BC0DE;
+
+  /* Layout */
+  --sidebar-width: 14rem;
+  --sidebar-width-collapsed: 4rem;
 }
 
-/* Apply page background globally */
 body {
   background-color: var(--color-bg-page) !important;
 }
 
-/* Apply card shadows to common card patterns */
 .bg-white.rounded-xl,
 .bg-white.rounded-2xl {
   box-shadow: var(--shadow-card);

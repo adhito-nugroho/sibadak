@@ -156,4 +156,37 @@ class DpnController
         header('Location: ' . APP_URL . '/dpn');
         exit;
     }
+
+    public function bulk(): void
+    {
+        requireLogin();
+        verify_csrf();
+        $action = trim((string) ($_POST['action'] ?? ''));
+        $ids = bulk_require_ids('/dpn', 'DPN');
+        $rows = $this->model()->findByIds($ids);
+        if ($rows === []) {
+            bulk_flash_redirect('/dpn', 'error', 'Tidak ada data DPN yang cocok.');
+        }
+        if ($action !== 'export') {
+            bulk_flash_redirect('/dpn', 'error', 'Aksi massal tidak dikenal.');
+        }
+        $dataRows = [];
+        foreach ($rows as $r) {
+            $dataRows[] = [
+                (string) ($r['sasaran'] ?? ''),
+                (string) ($r['lokasi'] ?? ''),
+                (string) ($r['subdas'] ?? ''),
+                (int) ($r['jumlah_unit'] ?? 0),
+                (int) ($r['tahun'] ?? 0),
+            ];
+        }
+        bulk_stream_xlsx(
+            'Data DPN',
+            ['Sasaran', 'Lokasi', 'SubDAS', 'Unit', 'Tahun'],
+            $dataRows,
+            'sibadak-dpn',
+            $this->pdo(),
+            'dpn'
+        );
+    }
 }

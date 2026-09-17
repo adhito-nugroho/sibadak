@@ -100,4 +100,31 @@ class RkpsKps extends BaseModel
         $stmt->execute([$kpsId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    /**
+     * @param list<int> $ids
+     * @return list<array<string,mixed>>
+     */
+    public function findByIds(array $ids, ?int $operatorKabId = null): array
+    {
+        $ids = bulk_parse_ids($ids);
+        if ($ids === []) {
+            return [];
+        }
+        $in = bulk_in_clause($ids);
+        $params = $in['params'];
+        $where = 'r.id IN (' . $in['sql'] . ')';
+        if ($operatorKabId !== null) {
+            $where .= ' AND kps.kabupaten_id = ?';
+            $params[] = $operatorKabId;
+        }
+        $sql = 'SELECT r.*, kps.nama_lembaga, kps.skema, kb.nama AS kabupaten_nama
+            FROM kps_rkps r
+            JOIN kps ON r.kps_id = kps.id
+            JOIN kabupaten kb ON kps.kabupaten_id = kb.id
+            WHERE ' . $where . '
+            ORDER BY r.periode_awal DESC, kps.nama_lembaga ASC';
+
+        return $this->query($sql, $params);
+    }
 }
