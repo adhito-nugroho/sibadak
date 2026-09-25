@@ -74,7 +74,6 @@ CREATE TABLE IF NOT EXISTS `hhk_detail` (
     `volume_bulan_ini_m3`    DECIMAL(14,4) NOT NULL DEFAULT 0,
     `volume_sd_bulan_lalu_m3` DECIMAL(14,4) NOT NULL DEFAULT 0,
     `volume_sd_bulan_ini_m3`  DECIMAL(14,4) NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`),
     UNIQUE KEY `uq_hhkdetail_jenis` (`hhk_id`, `jenis_kayu`),
     CONSTRAINT `fk_hhkdetail_hhk` FOREIGN KEY (`hhk_id`) REFERENCES `hhk`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Detail volume produksi HHK per jenis kayu';
@@ -114,7 +113,6 @@ CREATE TABLE IF NOT EXISTS `hhbk_detail` (
     `jumlah_bulan_ini`     DECIMAL(14,4) NOT NULL DEFAULT 0,
     `jumlah_sd_bulan_lalu` DECIMAL(14,4) NOT NULL DEFAULT 0,
     `jumlah_sd_bulan_ini`  DECIMAL(14,4) NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`),
     UNIQUE KEY `uq_hhbkdetail_komoditas` (`hhbk_id`, `komoditas`, `satuan`),
     CONSTRAINT `fk_hhbkdetail_hhbk` FOREIGN KEY (`hhbk_id`) REFERENCES `hhbk`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Detail produksi HHBK per komoditas dan satuan';
@@ -149,7 +147,6 @@ CREATE TABLE IF NOT EXISTS `hhk_target_dpa` (
     `tahun`        YEAR NOT NULL,
     `komoditas_id` INT UNSIGNED NOT NULL,
     `target_m3`    DECIMAL(14,4) DEFAULT 0,
-    PRIMARY KEY (`id`),
     UNIQUE KEY `uq_target_hhk` (`tahun`, `komoditas_id`),
     KEY `fk_target_hhk_komoditas` (`komoditas_id`),
     CONSTRAINT `fk_target_hhk_komoditas` FOREIGN KEY (`komoditas_id`) REFERENCES `hhk_komoditas`(`id`) ON DELETE CASCADE
@@ -186,7 +183,6 @@ CREATE TABLE IF NOT EXISTS `hhbk_target_dpa` (
     `tahun`        YEAR NOT NULL,
     `komoditas_id` INT UNSIGNED NOT NULL,
     `target_nilai` DECIMAL(14,4) DEFAULT 0,
-    PRIMARY KEY (`id`),
     UNIQUE KEY `uq_target_hhbk` (`tahun`, `komoditas_id`),
     KEY `fk_target_hhbk_komoditas` (`komoditas_id`),
     CONSTRAINT `fk_target_hhbk_komoditas` FOREIGN KEY (`komoditas_id`) REFERENCES `hhbk_komoditas`(`id`) ON DELETE CASCADE
