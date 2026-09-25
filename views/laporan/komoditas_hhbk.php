@@ -22,7 +22,7 @@ $yearOptions = range((int)date('Y'), 2020);
                 <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-1">Satuan</label>
                 <select name="satuan" required class="w-full text-xs px-3 py-2 rounded-lg border border-gray-200 outline-none">
                     <option value="Kg">Kg</option>
-                    <option value="Btg">Btg</option>
+                    <option value="Batang">Batang</option>
                 </select>
             </div>
             <div class="w-20">

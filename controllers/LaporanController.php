@@ -119,8 +119,11 @@ class LaporanController
         $pdo = $this->pdo();
         $nama = trim(req_str('nama'));
         $satuan = req_str('satuan');
+        if ($satuan === 'Btg') {
+            $satuan = 'Batang';
+        }
         $urutan = (int) req_str('urutan');
-        if ($nama === '' || !in_array($satuan, ['Kg','Btg'], true)) {
+        if ($nama === '' || !in_array($satuan, ['Kg', 'Batang', 'Btg'], true)) {
             set_flash('error', 'Nama dan satuan wajib diisi.'); header('Location: ' . APP_URL . '/laporan/komoditas-hhbk'); exit;
         }
         $this->hhbkModel()->saveKomoditas($nama, $satuan, $urutan > 0 ? $urutan : 99);
