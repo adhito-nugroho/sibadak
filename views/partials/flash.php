@@ -1,17 +1,36 @@
 <?php
-$flash = consume_flash();
-if ($flash === null) {
+$flashData = $flashData ?? consume_flash();
+if ($flashData === null) {
     return;
 }
-$isOk = $flash['type'] === 'success';
-$cls = $isOk
-    ? 'border-emerald-200 bg-emerald-50/90 text-emerald-900'
-    : 'border-red-200 bg-red-50/90 text-red-900';
-$icon = $isOk
-    ? '<svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
-    : '<svg class="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+
+$type = (string) ($flashData['type'] ?? 'error');
+$variants = [
+    'success' => [
+        'class' => 'flash--success',
+        'icon'  => '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>',
+        'role'  => 'status',
+    ],
+    'info' => [
+        'class' => 'flash--info',
+        'icon'  => '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2"/></svg>',
+        'role'  => 'status',
+    ],
+    'warning' => [
+        'class' => 'flash--warning',
+        'icon'  => '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>',
+        'role'  => 'status',
+    ],
+    'error' => [
+        'class' => 'flash--error',
+        'icon'  => '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>',
+        'role'  => 'alert',
+    ],
+];
+
+$variant = $variants[$type] ?? $variants['error'];
 ?>
-<div class="fade-up flex gap-3 rounded-2xl border px-4 py-3 text-sm shadow-sm <?= $cls ?>">
-    <?= $icon ?>
-    <span class="leading-snug"><?= htmlspecialchars($flash['msg'], ENT_QUOTES, 'UTF-8') ?></span>
+<div role="<?= $variant['role'] ?>" class="flash fade-up <?= $variant['class'] ?>">
+    <span class="flash__icon"><?= $variant['icon'] ?></span>
+    <span class="flash__msg"><?= htmlspecialchars((string) $flashData['msg'], ENT_QUOTES, 'UTF-8') ?></span>
 </div>

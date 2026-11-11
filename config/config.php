@@ -49,6 +49,7 @@ if (isset($_SERVER['HTTP_HOST'])) {
 define('APP_URL', rtrim($dynamicUrl, '/'));
 define('APP_ENV', $_ENV['APP_ENV'] ?? 'development');
 define('APP_DEBUG', filter_var($_ENV['APP_DEBUG'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
+define('SHOW_PUBLIC_STATS', filter_var($_ENV['SHOW_PUBLIC_STATS'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
 
 date_default_timezone_set($_ENV['TIMEZONE'] ?? 'Asia/Jakarta');
 

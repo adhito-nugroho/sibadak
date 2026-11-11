@@ -583,6 +583,14 @@ CREATE TABLE activity_log (
     INDEX idx_log_waktu (created_at)
 ) COMMENT='Log aktivitas pengguna';
 
+CREATE TABLE login_attempts (
+    id           BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ip_address   VARCHAR(45) NOT NULL,
+    username     VARCHAR(60) NOT NULL,
+    attempted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_login_attempts_lookup (ip_address, username, attempted_at)
+) COMMENT='Percobaan login untuk rate limiting';
+
 -- ============================================================
 -- BAGIAN 18: DATA AWAL (SEED)
 -- ============================================================

@@ -5,6 +5,12 @@ declare(strict_types=1);
 function requireLogin(): void
 {
     if (empty($_SESSION['user_id'])) {
+        // Bedakan kunjungan pertama dari sesi yang benar-benar berakhir:
+        // cookie sesi yang masih dikirim browser menandakan sesi lama.
+        if (!empty($_SESSION) || isset($_COOKIE[session_name()])) {
+            set_flash('info', 'Sesi Anda telah berakhir. Silakan masuk kembali.');
+        }
+
         header('Location: ' . APP_URL . '/login');
         exit;
     }

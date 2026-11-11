@@ -24,8 +24,10 @@ function csrf_token(): string
 
 function verify_csrf(): void
 {
-    $sent = $_POST['csrf_token'] ?? '';
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', $sent)) {
+    $sent = (string) ($_POST['csrf_token'] ?? '');
+    $stored = (string) ($_SESSION['csrf_token'] ?? '');
+
+    if ($stored === '' || $sent === '' || !hash_equals($stored, $sent)) {
         http_response_code(403);
         echo 'CSRF token tidak valid';
         exit;

@@ -69,6 +69,60 @@ body {
   background-color: var(--color-bg-page) !important;
 }
 
+/* Flash messages (login + app layouts) */
+.flash {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(26, 46, 34, 0.05);
+}
+
+.flash__icon {
+  flex: 0 0 auto;
+  margin-top: 0.125rem;
+}
+
+.flash__icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.flash__msg { min-width: 0; }
+
+.flash--success {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #022c22;
+}
+.flash--success .flash__icon { color: #047857; }
+
+.flash--info {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #172554;
+}
+.flash--info .flash__icon { color: #1d4ed8; }
+
+.flash--warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #451a03;
+}
+.flash--warning .flash__icon { color: #b45309; }
+
+.flash--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #450a0a;
+}
+.flash--error .flash__icon { color: #b42318; }
+
 .bg-white.rounded-xl,
 .bg-white.rounded-2xl {
   box-shadow: var(--shadow-card);
