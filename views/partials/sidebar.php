@@ -21,14 +21,12 @@ $iconClass = static function (string $key, string $nav): string {
     <!-- Brand -->
     <div class="px-3 py-4 border-b border-white/10">
         <div class="brand-row flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-lg bg-forest-500 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                <svg viewBox="0 0 40 40" fill="none" class="w-9 h-9" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <rect width="40" height="40" rx="10" fill="#22c55e"/>
-                    <path d="M20 8c-1.2 2-6 7-6 12a6 6 0 0 0 12 0c0-5-4.8-10-6-12z" fill="white" opacity="0.92"/>
-                    <rect x="18.8" y="23" width="2.4" height="6" rx="1.2" fill="white" opacity="0.7"/>
-                    <circle cx="16.5" cy="15.5" r="1.8" fill="white" opacity="0.35"/>
-                    <circle cx="23.5" cy="17" r="1.3" fill="white" opacity="0.25"/>
-                </svg>
+            <div class="w-9 h-9 rounded-lg bg-white flex items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
+                <img
+                    src="<?= htmlspecialchars(APP_URL . '/assets/img/logo-jawa-timur.svg', ENT_QUOTES, 'UTF-8') ?>"
+                    alt="Logo Jawa Timur"
+                    class="w-full h-full object-contain"
+                    decoding="async">
             </div>
             <div class="brand-text min-w-0">
                 <p class="text-white font-semibold text-sm leading-tight"><?= htmlspecialchars(APP_NAME, ENT_QUOTES, 'UTF-8') ?></p>

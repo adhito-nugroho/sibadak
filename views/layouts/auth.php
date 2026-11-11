@@ -1,8 +1,8 @@
 <?php
-// Logo resmi: taruh file di static/img/logo-jatim.png (root aplikasi).
+// Logo resmi: assets/img/logo-jawa-timur.svg.
 // Fallback otomatis ke teks "JATIM" bila gambar gagal dimuat.
-$logoFile = app_path('static/img/logo-jatim.png');
-$logoUrl = APP_URL . '/static/img/logo-jatim.png';
+$logoFile = app_path('assets/img/logo-jawa-timur.svg');
+$logoUrl = APP_URL . '/assets/img/logo-jawa-timur.svg';
 $heroUrl = is_file(app_path('assets/img/hero-bojonegoro.jpg'))
     ? APP_URL . '/assets/img/hero-bojonegoro.jpg'
     : '';
@@ -70,7 +70,7 @@ $headline = 'Data kehutanan Bojonegoro, satu pintu.';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <?php if (is_file($logoFile)): ?>
-    <link rel="icon" type="image/png" href="<?= htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8') ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8') ?>">
     <?php else: ?>
     <link rel="icon" href="data:,">
     <?php endif; ?>
@@ -171,8 +171,9 @@ $headline = 'Data kehutanan Bojonegoro, satu pintu.';
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 52px;
-        padding: 7px 10px;
+        width: 62px;
+        min-height: 62px;
+        padding: 8px 10px;
         background: #FFFFFF;
         border-radius: 10px;
         box-shadow: inset 0 0 0 1px rgba(15, 61, 36, 0.08);
@@ -182,7 +183,7 @@ $headline = 'Data kehutanan Bojonegoro, satu pintu.';
       .auth-logo-img {
         display: block;
         width: auto;
-        height: 38px;
+        height: 46px;
         max-width: 124px;
         object-fit: contain;
       }
@@ -348,11 +349,12 @@ $headline = 'Data kehutanan Bojonegoro, satu pintu.';
       }
 
       .auth-mobile-brand .auth-logo-box {
-        min-height: 44px;
-        padding: 5px 8px;
+        width: 48px;
+        min-height: 50px;
+        padding: 6px 8px;
       }
 
-      .auth-mobile-brand .auth-logo-img { height: 32px; }
+      .auth-mobile-brand .auth-logo-img { height: 38px; }
 
       .auth-mobile-brand-name {
         margin: 0;
